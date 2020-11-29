@@ -2,6 +2,10 @@ package com.example.appchat;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -14,11 +18,15 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 public class MainActivity extends AppCompatActivity {
-
+    ListView listViewUser, listViewNoiDung;
+    TextView txtNoiDung;
+    EditText edtInput;
+    ImageButton imgButtonAddUser, imgButtonSend;
     private Socket mSocket;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AnhXa();
         setContentView(R.layout.activity_main);
         try {
             mSocket = IO.socket("http://192.168.1.3:3000/");
@@ -46,4 +54,11 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     };
+    public void AnhXa(){
+        listViewUser        = findViewById(R.id.listViewUser);
+        listViewNoiDung     = findViewById(R.id.listViewNoiDung);
+        edtInput            = findViewById(R.id.editTextInput);
+        imgButtonAddUser    = findViewById(R.id.imageButtonAdd);
+        imgButtonSend       = findViewById(R.id.imageButtonSend);
+    }
 }
