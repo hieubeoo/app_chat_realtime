@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
     EditText edtInput;
     ImageButton imgButtonAddUser, imgButtonSend;
 
-    ArrayList<String> arrayUser;
-    ArrayAdapter adapterUser;
+    ArrayList<String> arrayUser, arrayChat;
+    ArrayAdapter adapterUser, adapterChat;
     private Socket mSocket;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +48,17 @@ public class MainActivity extends AppCompatActivity {
 
         //nhan ket qua user dang ky thanh cong hay that bai
         mSocket.on("server-send-result",onRetriveResult);
-
+        //nhan du lieu chat tu server
+        mSocket.on("server-send-chat", onRetriveChat);
+        //danh sach nguoi user
         arrayUser = new ArrayList<>();
         adapterUser = new ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayUser);
-
         listViewUser.setAdapter(adapterUser);
+        //chat
+        arrayChat = new ArrayList<>();
+        adapterChat = new ArrayAdapter(this,android.R.layout.simple_list_item_1, arrayChat);
+        listViewNoiDung.setAdapter(adapterChat);
+
         imgButtonAddUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,7 +67,33 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        imgButtonSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(edtInput.getText().toString().trim().length() > 0){
+                    mSocket.emit("client-send-chat", edtInput.getText().toString());
+                }
+            }
+        });
     }
+    private Emitter.Listener onRetriveChat = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject object = (JSONObject) args[0];
+                    try {
+                        String chat = object.getString("chat");
+                        arrayChat.add(chat);
+                        adapterChat.notifyDataSetChanged();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    };
     private Emitter.Listener onRetriveUser = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
